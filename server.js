@@ -774,15 +774,15 @@ app.get('/api/updates/:id', isAdmin, async (req, res) => {
 app.post('/api/updates', isAdmin, async (req, res) => {
     try {
         const { version, date, title, content, features } = req.body;
-        if (!version || !title || !content) {
-            return res.status(400).json({ error: 'Версия, название и содержание обязательны' });
-        }
-
-        const id = 'update_' + Date.now();
+        // ...
+        
+        // ✅ ГАРАНТИРУЕМ, ЧТО features — ЭТО МАССИВ
+        const featuresArray = Array.isArray(features) ? features : [];
+        
         await runQuery(`
             INSERT INTO updates (id, version, date, title, content, features)
             VALUES (?, ?, ?, ?, ?, ?)
-        `, [id, version, date || new Date().toISOString().split('T')[0], title, content, JSON.stringify(features || [])]);
+        `, [id, version, date, title, content, JSON.stringify(featuresArray)]);
 
         const update = await getQuery('SELECT * FROM updates WHERE id = ?', [id]);
         
