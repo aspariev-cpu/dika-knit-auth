@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - Dika Knit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #00b894;
+            --dark: #0a0a1a;
+            --text: #ffffff;
+            --text-light: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.3);
+            --glass: rgba(255,255,255,0.03);
+            --glass-border: rgba(255,255,255,0.06);
+            --gradient: linear-gradient(135deg, #6c5ce7, #a29bfe, #fd79a8);
+            --gradient-primary: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --gradient-secondary: linear-gradient(135deg, #00b894, #55efc4);
+            --gradient-gold: linear-gradient(135deg, #fdcb6e, #f39c12);
+            --radius: 16px;
+        }
+
+        html, body {
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+        }
+
+        .bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            background: var(--dark);
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(108,92,231,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(0,184,148,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(253,121,168,0.06) 0%, transparent 50%);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite alternate;
+        }
+        .orb-1 { width: 600px; height: 600px; background: rgba(108,92,231,0.15); top: -200px; left: -200px; }
+        .orb-2 { width: 500px; height: 500px; background: rgba(0,184,148,0.10); bottom: -150px; right: -150px; animation-delay: -7s; }
+        .orb-3 { width: 400px; height: 400px; background: rgba(253,121,168,0.08); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -14s; }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(60px,-40px) scale(1.1); }
+            66% { transform: translate(-40px,30px) scale(0.9); }
+            100% { transform: translate(30px,-20px) scale(1.05); }
+        }
+
+        .bg-grid {
+            position: absolute;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.5;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%; height: 100%;
+        }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: starTwinkle 3s ease-in-out infinite alternate;
+        }
+        @keyframes starTwinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10,10,26,0.6);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        .nav-logo .highlight {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient);
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+        .nav-link:hover { color: white; }
+        .nav-link:hover::after { width: 100%; }
+        .nav-link.active { color: white; }
+        .nav-link.active::after { width: 100%; }
+
+        .nav-btn {
+            padding: 0.5rem 1.8rem;
+            border-radius: 50px;
+            background: var(--gradient-primary);
+            color: white !important;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.25);
+            transition: 0.3s;
+        }
+        .nav-btn::after { display: none; }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108,92,231,0.4);
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            padding: 6rem 2rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.3);
+        }
+
+        .user-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: rgba(255,107,107,0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(255,107,107,0.15);
+        }
+        .btn-danger:hover {
+            background: rgba(255,107,107,0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(108,92,231,0.25);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108,92,231,0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-gold {
+            background: var(--gradient-gold);
+            color: var(--dark);
+            box-shadow: 0 4px 20px rgba(253,203,110,0.25);
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(253,203,110,0.4);
+        }
+
+        .btn-sm { padding: 0.4rem 1rem; font-size: 0.75rem; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            transition: 0.3s;
+        }
+        .card:hover {
+            border-color: rgba(108,92,231,0.15);
+            transform: translateY(-3px);
+        }
+
+        .card .icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+        .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--text-light); }
+        .card p { color: var(--text-light); font-size: 0.9rem; line-height: 1.6; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+        .status-active { background: rgba(0,184,148,0.15); color: #00b894; }
+        .status-inactive { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+        .status-expiring { background: rgba(253,203,110,0.15); color: #fdcb6e; }
+
+        .hwid-display {
+            font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.05);
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            word-break: break-all;
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,0.05);
+            margin: 0.5rem 0;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .quick-btn {
+            padding: 1rem;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .quick-btn:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(108,92,231,0.2);
+            transform: translateY(-3px);
+        }
+        .quick-btn .icon { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+        .quick-btn .label { font-size: 0.8rem; font-weight: 500; }
+
+        .hwid-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .hwid-modal.show {
+            display: flex;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .hwid-modal-content {
+            max-width: 500px;
+            width: 90%;
+            padding: 2.5rem;
+            background: var(--dark-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .hwid-modal-content .hwid {
+            font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            word-break: break-all;
+            margin: 1rem 0;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .hwid-modal-content .btn { margin: 0.3rem; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .orders-table th {
+            text-align: left;
+            padding: 0.6rem 0.5rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .orders-table td {
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .status-order {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .status-order.pending { background: rgba(253,203,110,0.15); color: #fdcb6e; }
+        .status-order.check { background: rgba(108,92,231,0.15); color: #a29bfe; }
+        .status-order.completed { background: rgba(0,184,148,0.15); color: #00b894; }
+        .status-order.rejected { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+
+        @media (max-width: 992px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+            .quick-actions { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0.8rem 1rem; }
+            .nav-links { gap: 0.8rem; }
+            .nav-link { font-size: 0.8rem; }
+            .nav-btn { padding: 0.4rem 1rem; font-size: 0.8rem; }
+            .page-wrapper { padding: 5rem 1rem 1rem; }
+            .dashboard-header { flex-direction: column; align-items: flex-start; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .quick-actions { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg">
+        <div class="bg-gradient"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="bg-grid"></div>
+        <div class="stars" id="stars"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="/" class="nav-logo">🧶 Dika<span class="highlight">Knit</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Главная</a>
+            <a href="/dashboard.html" class="nav-link active">Кабинет</a>
+            <a href="/tutorial.html" class="nav-link">Обучение</a>
+            <a href="/updates.html" class="nav-link">Обновления</a>
+            <a href="#" class="nav-link nav-btn" id="logoutBtn">Выйти</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar">U</div>
+                <div>
+                    <div class="user-name" id="userName">Пользователь</div>
+                    <div class="user-email" id="userEmail">email@example.com</div>
+                </div>
+            </div>
+            <button class="btn btn-danger" id="logoutBtn2">🚪 Выйти</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- 1. Лицензия -->
+            <div class="card">
+                <span class="icon">📜</span>
+                <h3>Статус лицензии</h3>
+                <div id="licenseStatus">
+                    <span class="status-badge status-inactive">⏳ Загрузка...</span>
+                </div>
+                <div id="licenseDetails" style="display:none; margin-top:0.5rem;">
+                    <p style="font-size:0.85rem; color:var(--text-light);">
+                        Срок: <strong id="licenseExpires" style="color:var(--text);">—</strong>
+                    </p>
+                    <p style="font-size:0.85rem; color:var(--text-light);">
+                        Клиент: <strong id="licenseClient" style="color:var(--text);">—</strong>
+                    </p>
+                </div>
+                <div style="margin-top:0.8rem;">
+                    <a href="/activate.html" class="btn btn-primary btn-sm btn-block">💳 Купить лицензию</a>
+                </div>
+            </div>
+
+            <!-- 2. Устройство -->
+            <div class="card">
+                <span class="icon">💻</span>
+                <h3>Устройство</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Hardware ID</p>
+                <div class="hwid-display" id="hardwareIdDisplay">
+                    <span style="color:var(--text-muted);">Не установлен</span>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary btn-sm" id="uploadHwidBtn">
+                        📂 Загрузить HWID
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="copyHwidBtn" disabled>
+                        📋 Копировать
+                    </button>
+                </div>
+                <input type="file" id="hwidFileInput" accept=".txt" style="display:none;">
+                <p style="font-size:0.7rem; color:var(--text-muted); margin-top:0.5rem;">
+                    <a href="#" onclick="alert('Запустите get-hwid.bat на рабочем столе, затем загрузите computer_info.txt')" style="color:var(--primary);">
+                        ❓ Как получить HWID?
+                    </a>
+                </p>
+            </div>
+
+            <!-- 3. Заказы -->
+            <div class="card">
+                <span class="icon">📦</span>
+                <h3>Мои заказы</h3>
+                <div id="ordersList">
+                    <p style="color:var(--text-muted); font-size:0.85rem;">Загрузка...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <a href="/activate.html" class="quick-btn">
+                <span class="icon">💳</span>
+                <span class="label">Купить лицензию</span>
+            </a>
+            <a href="/tutorial.html" class="quick-btn">
+                <span class="icon">📖</span>
+                <span class="label">Туториал</span>
+            </a>
+            <a href="/updates.html" class="quick-btn">
+                <span class="icon">🔄</span>
+                <span class="label">Обновления</span>
+            </a>
+            <a href="https://discord.com/channels/1523689955224850482/1523694333130440775" target="_blank" class="quick-btn">
+                <span class="icon">💬</span>
+                <span class="label">Поддержка</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="hwid-modal" id="hwidModal">
+        <div class="hwid-modal-content">
+            <span style="font-size:3rem;">💻</span>
+            <h3 style="margin:0.5rem 0;">Ваш Hardware ID</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Уникальный идентификатор вашего устройства</p>
+            <div class="hwid" id="hwidModalValue">—</div>
+            <div>
+                <button class="btn btn-primary" id="copyHwidModalBtn">📋 Копировать</button>
+                <button class="btn btn-secondary" id="closeHwidModalBtn">Закрыть</button>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.7rem; margin-top:0.8rem;">
+                Скопируйте этот ID и вставьте при покупке лицензии
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // ЗВЕЗДЫ
+        // ========================================
+        (function() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = (2 + Math.random() * 3) + 's';
+                star.style.width = (1 + Math.random() * 2) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        })();
+
+        let currentHardwareId = null;
+        let userData = null;
+
+        // ========================================
+        // ПРОВЕРКА ДОСТУПА
+        // ========================================
+        async function checkAccess() {
+            try {
+                const response = await fetch('/api/check-session');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                // Если админ — отправляем в админку
+                if (data.user.isAdmin) {
+                    window.location.href = '/admin-content.html';
+                    return;
+                }
+                
+                // Обычный пользователь — кабинет
+                userData = data.user;
+                document.getElementById('userName').textContent = userData.username;
+                document.getElementById('userEmail').textContent = userData.email || 'email@example.com';
+                document.getElementById('userAvatar').textContent = userData.username[0].toUpperCase();
+                
+                if (userData.hardwareId) {
+                    currentHardwareId = userData.hardwareId;
+                    document.getElementById('hardwareIdDisplay').innerHTML = `<span style="color:var(--text);">${userData.hardwareId}</span>`;
+                    document.getElementById('copyHwidBtn').disabled = false;
+                }
+                
+                await loadLicenseInfo();
+                await loadOrders();
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // ========================================
+        // ЗАГРУЗКА ЛИЦЕНЗИИ
+        // ========================================
+        async function loadLicenseInfo() {
+            try {
+                const response = await fetch('/api/user-license');
+                const data = await response.json();
+                
+                const statusEl = document.getElementById('licenseStatus');
+                const detailsEl = document.getElementById('licenseDetails');
+                
+                if (data.hasLicense && data.valid) {
+                    statusEl.innerHTML = `<span class="status-badge status-active">✅ Активна</span>`;
+                    detailsEl.style.display = 'block';
+                    document.getElementById('licenseExpires').textContent = new Date(data.data.expires).toLocaleDateString('ru-RU');
+                    document.getElementById('licenseClient').textContent = data.data.client || '—';
+                    
+                    if (data.data.hardwareId) {
+                        currentHardwareId = data.data.hardwareId;
+                        document.getElementById('hardwareIdDisplay').innerHTML = `<span style="color:var(--text);">${data.data.hardwareId}</span>`;
+                        document.getElementById('copyHwidBtn').disabled = false;
+                    }
+                } else if (data.hasLicense && !data.valid) {
+                    statusEl.innerHTML = `<span class="status-badge status-inactive">❌ Истекла</span>`;
+                    detailsEl.style.display = 'none';
+                } else {
+                    statusEl.innerHTML = `<span class="status-badge status-inactive">⚠️ Не активирована</span>`;
+                    detailsEl.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки лицензии:', error);
+            }
+        }
+
+        // ========================================
+        // ЗАГРУЗКА ЗАКАЗОВ
+        // ========================================
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/admin/orders');
+                const data = await response.json();
+                
+                const container = document.getElementById('ordersList');
+                
+                if (!data.orders || data.orders.length === 0) {
+                    container.innerHTML = `
+                        <p style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:0.5rem 0;">
+                            У вас пока нет заказов
+                        </p>
+                        <a href="/activate.html" class="btn btn-gold btn-sm btn-block" style="margin-top:0.5rem;">💳 Купить лицензию</a>
+                    `;
+                    return;
+                }
+                
+                const orders = data.orders.slice(0, 3);
+                const statusMap = {
+                    'pending': { class: 'pending', label: '⏳ Ожидает' },
+                    'check_uploaded': { class: 'check', label: '📎 Чек загружен' },
+                    'completed': { class: 'completed', label: '✅ Выполнен' },
+                    'rejected': { class: 'rejected', label: '❌ Отклонён' }
+                };
+                
+                const tariffLabels = {
+                    'test': '🧪 Тестовый',
+                    'week': '1 неделя',
+                    'month': '1 месяц',
+                    'quarter': '3 месяца',
+                    'year': '1 год'
+                };
+                
+                let html = `<table class="orders-table"><thead><tr>
+                    <th>Дата</th><th>Тариф</th><th>Сумма</th><th>Статус</th>
+                </tr></thead><tbody>`;
+                
+                orders.forEach(order => {
+                    const status = statusMap[order.status] || statusMap.pending;
+                    const date = new Date(order.createdAt).toLocaleDateString('ru-RU');
+                    html += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${tariffLabels[order.tariffKey] || order.tariffKey}</td>
+                            <td>${order.amount.toLocaleString()} ₽</td>
+                            <td><span class="status-order ${status.class}">${status.label}</span></td>
+                        </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+                html += `
+                    <div style="text-align:center; margin-top:0.5rem;">
+                        <a href="/activate.html" class="btn btn-primary btn-sm">💳 Новый заказ</a>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Ошибка загрузки заказов:', error);
+                document.getElementById('ordersList').innerHTML = `
+                    <p style="color:var(--text-muted); font-size:0.85rem;">Ошибка загрузки заказов</p>
+                `;
+            }
+        }
+
+        // ========================================
+        // ЗАГРУЗКА HWID ИЗ ФАЙЛА
+        // ========================================
+        document.getElementById('uploadHwidBtn').addEventListener('click', function() {
+            document.getElementById('hwidFileInput').click();
+        });
+
+        document.getElementById('hwidFileInput').addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const content = event.target.result;
+                const hwid = extractHwidFromFile(content);
+                
+                if (hwid) {
+                    currentHardwareId = hwid;
+                    document.getElementById('hardwareIdDisplay').innerHTML = `<span style="color:var(--text);">${hwid}</span>`;
+                    document.getElementById('copyHwidBtn').disabled = false;
+                    
+                    // Сохраняем на сервере
+                    fetch('/api/save-hwid', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ hardwareId: hwid })
+                    }).then(() => {
+                        showNotification('✅ HWID загружен и сохранён!', 'success');
+                    }).catch(() => {
+                        showNotification('✅ HWID загружен!', 'success');
+                    });
+                } else {
+                    showNotification('❌ Не найден HWID в файле. Проверьте файл computer_info.txt', 'error');
+                }
+            };
+            reader.readAsText(file);
+            this.value = '';
+        });
+
+        function extractHwidFromFile(content) {
+            // Ищем ПОЛНЫЙ ID
+            const matchFull = content.match(/Полный:\s*([a-fA-F0-9]+)/);
+            if (matchFull) {
+                return matchFull[1]; // Возвращаем ПОЛНЫЙ ID
+            }
+            
+            // Если полный не найден, ищем короткий (как запасной вариант)
+            const matchShort = content.match(/Короткий:\s*([a-fA-F0-9]+)/);
+            if (matchShort) {
+                return matchShort[1];
+            }
+            
+            return null;
+        }
+
+        // ========================================
+        // КОПИРОВАНИЕ
+        // ========================================
+        document.getElementById('copyHwidBtn').addEventListener('click', function() {
+            if (currentHardwareId) {
+                copyText(currentHardwareId);
+            }
+        });
+
+        document.getElementById('copyHwidModalBtn').addEventListener('click', function() {
+            const text = document.getElementById('hwidModalValue').textContent;
+            if (text && text !== '—') {
+                copyText(text);
+            }
+        });
+
+        function copyText(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('✅ Скопировано!', 'success');
+                });
+            } else {
+                const input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showNotification('✅ Скопировано!', 'success');
+            }
+        }
+
+        // ========================================
+        // УВЕДОМЛЕНИЯ
+        // ========================================
+        function showNotification(message, type = 'info') {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 0.8rem 1.5rem;
+                border-radius: 10px;
+                background: ${type === 'error' ? 'rgba(255,107,107,0.95)' : 'rgba(0,184,148,0.95)'};
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                backdrop-filter: blur(10px);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // ВЫХОД
+        // ========================================
+        document.querySelectorAll('#logoutBtn, #logoutBtn2').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = '/login.html';
+                } catch (error) {
+                    console.error('Ошибка выхода:', error);
+                }
+            });
+        });
+
+        // ========================================
+        // ЗАПУСК
+        // ========================================
+        document.addEventListener('DOMContentLoaded', checkAccess);
+    </script>
+</body>
+</html>

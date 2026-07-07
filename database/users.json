@@ -1,0 +1,26 @@
+{
+  "users": [
+    {
+      "id": "admin-001",
+      "username": "admin",
+      "email": "admin@dikaknit.com",
+      "password": "$2a$10$vlJE02qhMGh/2BJ/Rk7W2.najmIL6HgoXMfgU.L4k.WosauLHfr1O",
+      "hardwareId": null,
+      "license": null,
+      "licenseExpires": null,
+      "createdAt": "2026-07-06T17:31:16.802Z",
+      "isAdmin": true
+    },
+    {
+      "id": "5b0a47a8-bcb5-49b4-adb8-6a86d4e5511d",
+      "username": "89897826405",
+      "email": "aspariev@gmail.com",
+      "password": "$2a$10$FxQsYm9pFQ6mq9nDlVkNuOf3r9DNMxeh6A045fcUuDZfYgF9PAoOG",
+      "hardwareId": "8c2df5b8e0bbf6a884d757e8bbdb453a350c75ee2a8acbd0d611642cfa4e594f",
+      "license": null,
+      "licenseExpires": null,
+      "createdAt": "2026-07-06T17:33:17.030Z",
+      "isAdmin": false
+    }
+  ]
+}

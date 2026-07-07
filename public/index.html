@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dika Knit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           ГЛОБАЛЬНЫЕ СТИЛИ
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #00b894;
+            --accent: #fd79a8;
+            --gold: #fdcb6e;
+            --dark: #0a0a1a;
+            --text: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.6);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a1a;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        /* ========================================
+           АНИМИРОВАННЫЙ ФОН
+           ======================================== */
+        .bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background: #0a0a1a;
+            overflow: hidden;
+        }
+
+        /* Градиентный фон */
+        .bg-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(108, 92, 231, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(0, 184, 148, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(253, 121, 168, 0.08) 0%, transparent 50%);
+        }
+
+        /* Плавающие сферы */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite alternate;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: rgba(108, 92, 231, 0.2);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 184, 148, 0.15);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: rgba(253, 121, 168, 0.12);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(60px, -40px) scale(1.1); }
+            66% { transform: translate(-40px, 30px) scale(0.9); }
+            100% { transform: translate(30px, -20px) scale(1.05); }
+        }
+
+        /* Сетка */
+        .bg-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.3;
+        }
+
+        /* Звезды */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: starTwinkle 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes starTwinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ========================================
+           НАВИГАЦИЯ
+           ======================================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 26, 0.5);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeDown 1s ease;
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo .highlight {
+            background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6c5ce7, #fd79a8);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .nav-btn::after {
+            display: none;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+        }
+
+        /* ========================================
+           ОСНОВНОЙ КОНТЕНТ - DIKA KNIT
+           ======================================== */
+        .main {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem 2rem;
+        }
+
+        .content {
+            text-align: center;
+            max-width: 900px;
+            animation: fadeUp 1.5s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(60px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Бренд Dika Knit */
+        .brand-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .brand-icon {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 1rem;
+            animation: floatIcon 4s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .brand-name {
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -4px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 20%, #fd79a8 50%, #fdcb6e 80%, #00b894 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 4s ease-in-out infinite alternate;
+            text-shadow: none;
+            filter: drop-shadow(0 0 60px rgba(108, 92, 231, 0.15));
+            position: relative;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .brand-sub {
+            display: block;
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+            font-weight: 300;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1rem;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .brand-tagline {
+            display: block;
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .brand-tagline span {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+
+        /* Разделитель */
+        .divider {
+            width: 60px;
+            height: 2px;
+            margin: 2rem auto;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        /* Описание */
+        .description {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.4);
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* Кнопки */
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 2.5rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            box-shadow: 0 4px 30px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(108, 92, 231, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Статистика */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .stat-number .gradient {
+            background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        /* ========================================
+           АДАПТИВНОСТЬ
+           ======================================== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                font-size: 0.8rem;
+            }
+
+            .nav-btn {
+                padding: 0.4rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .brand-name {
+                font-size: clamp(3rem, 15vw, 4.5rem);
+                letter-spacing: -2px;
+            }
+
+            .brand-icon {
+                font-size: 3.5rem;
+            }
+
+            .brand-sub {
+                letter-spacing: 6px;
+                font-size: 0.7rem;
+            }
+
+            .brand-tagline {
+                font-size: 0.9rem;
+            }
+
+            .stats {
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .buttons .btn {
+                padding: 0.7rem 1.8rem;
+                font-size: 0.85rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .nav-btn {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.7rem;
+            }
+
+            .brand-name {
+                font-size: 2.5rem;
+                letter-spacing: -1px;
+            }
+
+            .brand-icon {
+                font-size: 2.5rem;
+            }
+
+            .description {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========================================
+    АНИМИРОВАННЫЙ ФОН
+    ======================================== -->
+    <div class="bg">
+        <div class="bg-gradient"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="bg-grid"></div>
+        <div class="stars" id="stars"></div>
+    </div>
+
+    <!-- ========================================
+    НАВИГАЦИЯ
+    ======================================== -->
+    <nav class="navbar">
+        <a href="/" class="nav-logo">
+            🧶 Dika<span class="highlight">Knit</span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Главная</a>
+            <a href="/tutorial.html" class="nav-link">Обучение</a>
+            <a href="/updates.html" class="nav-link">Обновления</a>
+            <a href="/login.html" class="nav-link nav-btn" id="authBtn">Войти</a>
+        </div>
+    </nav>
+
+    <!-- ========================================
+    ОСНОВНОЙ КОНТЕНТ - DIKA KNIT
+    ======================================== -->
+    <main class="main">
+        <div class="content">
+            <!-- Бренд -->
+            <div class="brand-wrapper">
+                <span class="brand-icon">🧶</span>
+                <h1 class="brand-name">Dika Knit</h1>
+                <span class="brand-sub">License Management</span>
+                <span class="brand-tagline">
+                    Безопасная система <span>лицензирования</span>
+                </span>
+            </div>
+
+            <div class="divider"></div>
+
+            <p class="description">
+                Современная платформа для защиты вашего программного обеспечения.
+                Генерация и верификация лицензий с максимальной безопасностью.
+            </p>
+
+            <div class="buttons">
+                <a href="/register.html" id="startBtn" class="btn btn-primary">
+                    🚀 Начать
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+                <a href="/tutorial.html" class="btn btn-secondary">
+                    ▶ Узнать больше
+                </a>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number"><span class="gradient" id="stat1">0</span></span>
+                    <span class="stat-label">Активных лицензий</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number"><span class="gradient" id="stat2">0</span></span>
+                    <span class="stat-label">Пользователей</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number"><span class="gradient" id="stat3">0</span></span>
+                    <span class="stat-label">% Защиты</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ========================================
+        // ЗВЕЗДЫ
+        // ========================================
+        (function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = (2 + Math.random() * 3) + 's';
+                star.style.width = (1 + Math.random() * 2) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        })();
+
+        // ========================================
+        // АНИМАЦИЯ СТАТИСТИКИ
+        // ========================================
+        function animateNumber(element, target, duration = 2000) {
+            const start = 0;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Easing function
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const current = start + (target - start) * ease;
+                element.textContent = Math.floor(current);
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = target;
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Запускаем анимацию при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                animateNumber(document.getElementById('stat1'), 1247, 2500);
+                animateNumber(document.getElementById('stat2'), 856, 2500);
+                animateNumber(document.getElementById('stat3'), 99, 2000);
+            }, 500);
+        });
+
+        // ========================================
+        // ПРОВЕРКА АВТОРИЗАЦИИ (обновление кнопки "Войти")
+        // ========================================
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-session');
+                const data = await response.json();
+                const authBtn = document.getElementById('authBtn');
+                if (data.authenticated) {
+                    authBtn.textContent = `👤 ${data.user.username}`;
+                    authBtn.href = '/dashboard.html';
+                }
+            } catch (error) {
+                console.error('Ошибка проверки авторизации:', error);
+            }
+        }
+        checkAuth();
+
+        // ========================================
+// УМНАЯ КНОПКА "НАЧАТЬ"
+// ========================================
+document.addEventListener('DOMContentLoaded', async function() {
+    const startBtn = document.getElementById('startBtn');
+    
+    if (startBtn) {
+        try {
+            const response = await fetch('/api/check-session');
+            const data = await response.json();
+            
+            if (data.authenticated) {
+                // Если пользователь залогинен → в личный кабинет
+                startBtn.href = '/dashboard.html';
+            } else {
+                // Если не залогинен → на регистрацию
+                startBtn.href = '/register.html';
+            }
+        } catch (error) {
+            startBtn.href = '/register.html';
+        }
+    }
+});
+    </script>
+</body>
+</html>
