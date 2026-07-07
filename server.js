@@ -720,79 +720,129 @@ async function startServer() {
     });
 
     // =========================================
-    // ОБНОВЛЕНИЯ
-    // =========================================
-    app.get('/api/updates', async (req, res) => {
-        try {
-            const updates = await allQuery('SELECT * FROM updates ORDER BY date DESC');
-            res.json({ updates });
-        } catch (error) {
-            console.error('Ошибка получения обновлений:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-        }
-    });
-
-    app.get('/api/updates/:id', isAdmin, async (req, res) => {
-        try {
-            const update = await getQuery('SELECT * FROM updates WHERE id = ?', [req.params.id]);
-            if (!update) {
-                return res.status(404).json({ error: 'Обновление не найдено' });
+// ОБНОВЛЕНИЯ
+// =========================================
+app.get('/api/updates', async (req, res) => {
+    try {
+        const updates = await allQuery('SELECT * FROM updates ORDER BY date DESC');
+        
+        // Преобразуем features из JSON-строки в массив
+        updates.forEach(update => {
+            if (update.features) {
+                try {
+                    update.features = JSON.parse(update.features);
+                } catch (e) {
+                    update.features = [];
+                }
+            } else {
+                update.features = [];
             }
-            res.json(update);
-        } catch (error) {
-            console.error('Ошибка получения обновления:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-        }
-    });
+        });
+        
+        res.json({ updates });
+    } catch (error) {
+        console.error('Ошибка получения обновлений:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
 
-    app.post('/api/updates', isAdmin, async (req, res) => {
-        try {
-            const { version, date, title, content, features } = req.body;
-            if (!version || !title || !content) {
-                return res.status(400).json({ error: 'Версия, название и содержание обязательны' });
+app.get('/api/updates/:id', isAdmin, async (req, res) => {
+    try {
+        const update = await getQuery('SELECT * FROM updates WHERE id = ?', [req.params.id]);
+        if (!update) {
+            return res.status(404).json({ error: 'Обновление не найдено' });
+        }
+        
+        // Преобразуем features из JSON-строки в массив
+        if (update.features) {
+            try {
+                update.features = JSON.parse(update.features);
+            } catch (e) {
+                update.features = [];
             }
-
-            const id = 'update_' + Date.now();
-            await runQuery(`
-                INSERT INTO updates (id, version, date, title, content, features)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `, [id, version, date || new Date().toISOString().split('T')[0], title, content, JSON.stringify(features || [])]);
-
-            const update = await getQuery('SELECT * FROM updates WHERE id = ?', [id]);
-            res.json({ success: true, update });
-        } catch (error) {
-            console.error('Ошибка добавления обновления:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
+        } else {
+            update.features = [];
         }
-    });
+        
+        res.json(update);
+    } catch (error) {
+        console.error('Ошибка получения обновления:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
 
-    app.put('/api/updates/:id', isAdmin, async (req, res) => {
-        try {
-            const { version, date, title, content, features } = req.body;
-            
-            await runQuery(`
-                UPDATE updates 
-                SET version = ?, date = ?, title = ?, content = ?, features = ?
-                WHERE id = ?
-            `, [version, date, title, content, JSON.stringify(features || []), req.params.id]);
-
-            const update = await getQuery('SELECT * FROM updates WHERE id = ?', [req.params.id]);
-            res.json({ success: true, update });
-        } catch (error) {
-            console.error('Ошибка обновления:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
+app.post('/api/updates', isAdmin, async (req, res) => {
+    try {
+        const { version, date, title, content, features } = req.body;
+        if (!version || !title || !content) {
+            return res.status(400).json({ error: 'Версия, название и содержание обязательны' });
         }
-    });
 
-    app.delete('/api/updates/:id', isAdmin, async (req, res) => {
-        try {
-            await runQuery('DELETE FROM updates WHERE id = ?', [req.params.id]);
-            res.json({ success: true });
-        } catch (error) {
-            console.error('Ошибка удаления:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
+        const id = 'update_' + Date.now();
+        await runQuery(`
+            INSERT INTO updates (id, version, date, title, content, features)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `, [id, version, date || new Date().toISOString().split('T')[0], title, content, JSON.stringify(features || [])]);
+
+        const update = await getQuery('SELECT * FROM updates WHERE id = ?', [id]);
+        
+        // Преобразуем features
+        if (update.features) {
+            try {
+                update.features = JSON.parse(update.features);
+            } catch (e) {
+                update.features = [];
+            }
+        } else {
+            update.features = [];
         }
-    });
+
+        res.json({ success: true, update });
+    } catch (error) {
+        console.error('Ошибка добавления обновления:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.put('/api/updates/:id', isAdmin, async (req, res) => {
+    try {
+        const { version, date, title, content, features } = req.body;
+        
+        await runQuery(`
+            UPDATE updates 
+            SET version = ?, date = ?, title = ?, content = ?, features = ?
+            WHERE id = ?
+        `, [version, date, title, content, JSON.stringify(features || []), req.params.id]);
+
+        const update = await getQuery('SELECT * FROM updates WHERE id = ?', [req.params.id]);
+        
+        // Преобразуем features
+        if (update.features) {
+            try {
+                update.features = JSON.parse(update.features);
+            } catch (e) {
+                update.features = [];
+            }
+        } else {
+            update.features = [];
+        }
+
+        res.json({ success: true, update });
+    } catch (error) {
+        console.error('Ошибка обновления:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.delete('/api/updates/:id', isAdmin, async (req, res) => {
+    try {
+        await runQuery('DELETE FROM updates WHERE id = ?', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Ошибка удаления:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
 
     // =========================================
     // МЕДИА
