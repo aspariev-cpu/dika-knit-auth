@@ -933,7 +933,7 @@
         document.getElementById('updateTitle').value = data.title || '';
         document.getElementById('updateContent').value = data.content || '';
         
-        // ✅ ПРАВИЛЬНО: features — это массив, объединяем с переносами строк
+        // ✅ features — это массив, объединяем с переносами строк
         if (data.features && Array.isArray(data.features)) {
             document.getElementById('updateFeatures').value = data.features.join('\n');
         } else {
