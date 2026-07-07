@@ -615,40 +615,40 @@
     </div>
 
     <!-- ===== МОДАЛКА ОБНОВЛЕНИЙ ===== -->
-    <div class="modal" id="updateModal">
-        <div class="modal-content">
-            <h2 id="updateModalTitle">➕ Добавить обновление</h2>
-            <form id="updateForm">
-                <input type="hidden" id="updateId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Версия</label>
-                        <input type="text" id="updateVersion" placeholder="v2.1.0" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Дата</label>
-                        <input type="date" id="updateDate">
-                    </div>
+<div class="modal" id="updateModal">
+    <div class="modal-content">
+        <h2 id="updateModalTitle">➕ Добавить обновление</h2>
+        <form id="updateForm">
+            <input type="hidden" id="updateId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Версия</label>
+                    <input type="text" id="updateVersion" placeholder="v2.1.0" required>
                 </div>
                 <div class="form-group">
-                    <label>Название</label>
-                    <input type="text" id="updateTitle" placeholder="Новая система активации" required>
+                    <label>Дата</label>
+                    <input type="date" id="updateDate">
                 </div>
-                <div class="form-group">
-                    <label>Описание</label>
-                    <textarea id="updateContent" placeholder="Описание обновления..." required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Список изменений (каждый пункт с новой строки)</label>
-                    <textarea id="updateFeatures" placeholder="✨ Новая функция&#10;🐛 Исправлена ошибка"></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('updateModal')">Отмена</button>
-                    <button type="submit" class="btn btn-primary">Сохранить</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" id="updateTitle" placeholder="Новая система активации" required>
+            </div>
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea id="updateContent" placeholder="Описание обновления..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Список изменений (каждый пункт с новой строки)</label>
+                <textarea id="updateFeatures" placeholder="✨ Новая функция&#10;🐛 Исправлена ошибка" rows="5"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('updateModal')">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <script>
         // ========================================
@@ -919,57 +919,69 @@
         }
 
         function openUpdateModal(data = null) {
-            const modal = document.getElementById('updateModal');
-            const form = document.getElementById('updateForm');
-            form.reset();
-            document.getElementById('updateId').value = '';
-            document.getElementById('updateDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('updateModalTitle').textContent = '➕ Добавить обновление';
-            
-            if (data) {
-                document.getElementById('updateId').value = data.id;
-                document.getElementById('updateVersion').value = data.version || '';
-                document.getElementById('updateDate').value = data.date || '';
-                document.getElementById('updateTitle').value = data.title || '';
-                document.getElementById('updateContent').value = data.content || '';
-                document.getElementById('updateFeatures').value = (data.features || []).join('\n');
-                document.getElementById('updateModalTitle').textContent = '✏️ Редактировать обновление';
-            }
-            
-            modal.classList.add('show');
+    const modal = document.getElementById('updateModal');
+    const form = document.getElementById('updateForm');
+    form.reset();
+    document.getElementById('updateId').value = '';
+    document.getElementById('updateDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('updateModalTitle').textContent = '➕ Добавить обновление';
+    
+    if (data) {
+        document.getElementById('updateId').value = data.id;
+        document.getElementById('updateVersion').value = data.version || '';
+        document.getElementById('updateDate').value = data.date || '';
+        document.getElementById('updateTitle').value = data.title || '';
+        document.getElementById('updateContent').value = data.content || '';
+        
+        // ✅ ПРАВИЛЬНО: features — это массив, объединяем с переносами строк
+        if (data.features && Array.isArray(data.features)) {
+            document.getElementById('updateFeatures').value = data.features.join('\n');
+        } else {
+            document.getElementById('updateFeatures').value = '';
         }
+        
+        document.getElementById('updateModalTitle').textContent = '✏️ Редактировать обновление';
+    }
+    
+    modal.classList.add('show');
+}
 
         document.getElementById('updateForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('updateId').value;
-            const data = {
-                version: document.getElementById('updateVersion').value,
-                date: document.getElementById('updateDate').value,
-                title: document.getElementById('updateTitle').value,
-                content: document.getElementById('updateContent').value,
-                features: document.getElementById('updateFeatures').value.split('\n').filter(f => f.trim())
-            };
+    e.preventDefault();
+    const id = document.getElementById('updateId').value;
+    
+    // ✅ РАЗБИВАЕМ ПО СТРОКАМ И УДАЛЯЕМ ПУСТЫЕ
+    const featuresRaw = document.getElementById('updateFeatures').value;
+    const features = featuresRaw.split('\n').filter(f => f.trim() !== '');
+    
+    const data = {
+        version: document.getElementById('updateVersion').value,
+        date: document.getElementById('updateDate').value,
+        title: document.getElementById('updateTitle').value,
+        content: document.getElementById('updateContent').value,
+        features: features
+    };
 
-            try {
-                const url = id ? `/api/updates/${id}` : '/api/updates';
-                const method = id ? 'PUT' : 'POST';
-                const response = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    closeModal('updateModal');
-                    loadUpdates();
-                } else {
-                    alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                alert('Ошибка сохранения');
-            }
+    try {
+        const url = id ? `/api/updates/${id}` : '/api/updates';
+        const method = id ? 'PUT' : 'POST';
+        const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
+        const result = await response.json();
+        if (result.success) {
+            closeModal('updateModal');
+            loadUpdates();
+        } else {
+            alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+        }
+    } catch (error) {
+        console.error('Ошибка сохранения:', error);
+        alert('Ошибка сохранения');
+    }
+});
 
         async function editUpdate(id) {
             try {
