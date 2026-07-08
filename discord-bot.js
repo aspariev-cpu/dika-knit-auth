@@ -122,7 +122,7 @@ async function sendOrderNotification(order, checkUrl) {
             return false;
         }
 
-        // ✅ ПРЕОБРАЗУЕМ URL В ПРЯМУЮ ССЫЛКУ НА ИЗОБРАЖЕНИЕ
+        // ✅ ПРЯМАЯ ССЫЛКА НА ИЗОБРАЖЕНИЕ
         const imageUrl = checkUrl;
 
         const embed = new EmbedBuilder()
@@ -134,7 +134,7 @@ async function sendOrderNotification(order, checkUrl) {
                 { name: '📋 Тариф', value: order.tariffLabel || '—', inline: true },
                 { name: '💰 Сумма', value: `${Number(order.amount).toLocaleString()} ₽`, inline: true }
             )
-            .setImage(imageUrl) // ← ФОТО ЧЕКА БУДЕТ ПОКАЗАНО ПРЯМО В СООБЩЕНИИ
+            .setImage(imageUrl)  // ✅ ФОТО ЧЕКА ПОКАЗЫВАЕТСЯ ПРЯМО В СООБЩЕНИИ
             .setFooter({ text: 'Нажмите кнопку для подтверждения' })
             .setTimestamp();
 
