@@ -15,22 +15,16 @@ console.log('   CHANNEL_ID:', CHANNEL_ID ? '✅ Есть' : '❌ НЕТ!');
 console.log('   SERVER_URL:', SERVER_URL);
 console.log('');
 
-// Проверка настроек
 if (!TOKEN) {
-    console.error('❌ Ошибка: DISCORD_BOT_TOKEN не найден в .env');
-    console.log('   Проверь файл .env и перезапусти');
+    console.error('❌ Ошибка: DISCORD_BOT_TOKEN не найден');
     process.exit(1);
 }
 
 if (!CHANNEL_ID) {
-    console.error('❌ Ошибка: DISCORD_CHANNEL_ID не найден в .env');
-    console.log('   Проверь файл .env и перезапусти');
+    console.error('❌ Ошибка: DISCORD_CHANNEL_ID не найден');
     process.exit(1);
 }
 
-// =========================================
-// СОЗДАНИЕ БОТА
-// =========================================
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -39,9 +33,6 @@ const client = new Client({
     ]
 });
 
-// =========================================
-// ЗАПУСК БОТА
-// =========================================
 client.once('ready', () => {
     console.log(`✅ Discord бот запущен: ${client.user.tag}`);
     console.log(`📡 Подключен к каналу: ${CHANNEL_ID}`);
@@ -114,20 +105,14 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// =========================================
-// ОШИБКИ
-// =========================================
 client.on('error', error => {
     console.error('❌ Ошибка бота:', error);
 });
 
-// =========================================
-// ЗАПУСК
-// =========================================
 client.login(TOKEN);
 
 // =========================================
-// ЭКСПОРТ
+// ОТПРАВКА УВЕДОМЛЕНИЯ С ЧЕКОМ
 // =========================================
 async function sendOrderNotification(order, checkUrl) {
     try {
@@ -137,6 +122,9 @@ async function sendOrderNotification(order, checkUrl) {
             return false;
         }
 
+        // ✅ ПРЕОБРАЗУЕМ URL В ПРЯМУЮ ССЫЛКУ НА ИЗОБРАЖЕНИЕ
+        const imageUrl = checkUrl;
+
         const embed = new EmbedBuilder()
             .setTitle('📎 ЗАГРУЖЕН ЧЕК!')
             .setDescription(`**Заказ:** \`${order.id.slice(0,8)}\``)
@@ -144,10 +132,9 @@ async function sendOrderNotification(order, checkUrl) {
             .addFields(
                 { name: '🧑‍💼 Клиент', value: order.clientName, inline: true },
                 { name: '📋 Тариф', value: order.tariffLabel || '—', inline: true },
-                { name: '💰 Сумма', value: `${Number(order.amount).toLocaleString()} ₽`, inline: true },
-                { name: '📎 Чек', value: `[📸 Скачать](${checkUrl})`, inline: false }
+                { name: '💰 Сумма', value: `${Number(order.amount).toLocaleString()} ₽`, inline: true }
             )
-            .setImage(checkUrl)
+            .setImage(imageUrl) // ← ФОТО ЧЕКА БУДЕТ ПОКАЗАНО ПРЯМО В СООБЩЕНИИ
             .setFooter({ text: 'Нажмите кнопку для подтверждения' })
             .setTimestamp();
 
@@ -169,7 +156,7 @@ async function sendOrderNotification(order, checkUrl) {
             components: [row]
         });
 
-        console.log(`✅ Уведомление отправлено в Discord для заказа ${order.id}`);
+        console.log(`✅ Уведомление с чеком отправлено в Discord для заказа ${order.id}`);
         return true;
 
     } catch (error) {
@@ -178,6 +165,9 @@ async function sendOrderNotification(order, checkUrl) {
     }
 }
 
+// =========================================
+// ОТПРАВКА УВЕДОМЛЕНИЯ О НОВОМ ЗАКАЗЕ
+// =========================================
 async function sendNewOrderNotification(order) {
     try {
         const channel = client.channels.cache.get(CHANNEL_ID);
@@ -192,7 +182,7 @@ async function sendNewOrderNotification(order) {
             .addFields(
                 { name: '🧑‍💼 Клиент', value: order.clientName, inline: true },
                 { name: '📋 Тариф', value: order.tariffLabel || '—', inline: true },
-                { name: '💰 Сумма', value: `${order.amount.toLocaleString()} ₽`, inline: true },
+                { name: '💰 Сумма', value: `${Number(order.amount).toLocaleString()} ₽`, inline: true },
                 { name: '🆔 Hardware ID', value: `\`${order.hardwareId}\``, inline: false },
                 { name: '🔑 Заказ', value: `\`${order.id}\``, inline: false }
             )
