@@ -1,5 +1,7 @@
 const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 // =========================================
@@ -8,6 +10,7 @@ require('dotenv').config();
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
+const CHECKS_PATH = path.join(__dirname, 'public', 'uploads', 'checks');
 
 console.log('📋 ПРОВЕРКА КОНФИГА:');
 console.log('   TOKEN:', TOKEN ? '✅ Есть' : '❌ НЕТ!');
@@ -112,7 +115,7 @@ client.on('error', error => {
 client.login(TOKEN);
 
 // =========================================
-// ОТПРАВКА УВЕДОМЛЕНИЯ С ЧЕКОМ
+// ОТПРАВКА УВЕДОМЛЕНИЯ С ЧЕКОМ (КАК ФАЙЛ)
 // =========================================
 async function sendOrderNotification(order, checkUrl) {
     try {
@@ -122,9 +125,51 @@ async function sendOrderNotification(order, checkUrl) {
             return false;
         }
 
-        // ✅ ПРЯМАЯ ССЫЛКА НА ИЗОБРАЖЕНИЕ
-        const imageUrl = checkUrl;
+        // 🔍 ИЗВЛЕКАЕМ ИМЯ ФАЙЛА ИЗ URL
+        const fileName = checkUrl.split('/').pop();
+        const filePath = path.join(CHECKS_PATH, fileName);
 
+        console.log(`📁 Путь к чеку: ${filePath}`);
+
+        // Проверяем, существует ли файл
+        if (!fs.existsSync(filePath)) {
+            console.error(`❌ Файл не найден: ${filePath}`);
+            // Если файла нет — отправляем без фото
+            const embed = new EmbedBuilder()
+                .setTitle('📎 ЗАГРУЖЕН ЧЕК!')
+                .setDescription(`**Заказ:** \`${order.id.slice(0,8)}\``)
+                .setColor(0xFEE75C)
+                .addFields(
+                    { name: '🧑‍💼 Клиент', value: order.clientName, inline: true },
+                    { name: '📋 Тариф', value: order.tariffLabel || '—', inline: true },
+                    { name: '💰 Сумма', value: `${Number(order.amount).toLocaleString()} ₽`, inline: true },
+                    { name: '⚠️', value: 'Файл чека не найден на сервере', inline: false }
+                )
+                .setFooter({ text: 'Нажмите кнопку для подтверждения' })
+                .setTimestamp();
+
+            const row = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`confirm_${order.id}`)
+                        .setLabel('✅ Подтвердить')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId(`reject_${order.id}`)
+                        .setLabel('❌ Отклонить')
+                        .setStyle(ButtonStyle.Danger)
+                );
+
+            await channel.send({
+                content: `📎 **Новый чек для проверки!**`,
+                embeds: [embed],
+                components: [row]
+            });
+
+            return true;
+        }
+
+        // ✅ ОТПРАВЛЯЕМ ЧЕК КАК ВЛОЖЕНИЕ (ФАЙЛ)
         const embed = new EmbedBuilder()
             .setTitle('📎 ЗАГРУЖЕН ЧЕК!')
             .setDescription(`**Заказ:** \`${order.id.slice(0,8)}\``)
@@ -134,7 +179,7 @@ async function sendOrderNotification(order, checkUrl) {
                 { name: '📋 Тариф', value: order.tariffLabel || '—', inline: true },
                 { name: '💰 Сумма', value: `${Number(order.amount).toLocaleString()} ₽`, inline: true }
             )
-            .setImage(imageUrl)  // ✅ ФОТО ЧЕКА ПОКАЗЫВАЕТСЯ ПРЯМО В СООБЩЕНИИ
+            .setImage(`attachment://${fileName}`)  // ✅ ССЫЛКА НА ВЛОЖЕНИЕ
             .setFooter({ text: 'Нажмите кнопку для подтверждения' })
             .setTimestamp();
 
@@ -150,13 +195,19 @@ async function sendOrderNotification(order, checkUrl) {
                     .setStyle(ButtonStyle.Danger)
             );
 
+        // ✅ ОТПРАВЛЯЕМ С ФАЙЛОМ
         await channel.send({
             content: `📎 **Новый чек для проверки!**`,
             embeds: [embed],
+            files: [{
+                attachment: filePath,
+                name: fileName
+            }],
             components: [row]
         });
 
-        console.log(`✅ Уведомление с чеком отправлено в Discord для заказа ${order.id}`);
+        console.log(`✅ Чек отправлен в Discord для заказа ${order.id}`);
+        console.log(`📸 Файл: ${fileName}`);
         return true;
 
     } catch (error) {
