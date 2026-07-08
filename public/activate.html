@@ -528,46 +528,39 @@
                 <input type="text" id="hardwareId" placeholder="Введите Hardware ID вашего устройства">
             </div>
 
-            <div class="form-group">
-                <label>Выберите тариф <span class="required">*</span></label>
-                <div class="tariffs-grid">
-                    <div class="tariff-option test">
-                        <input type="radio" name="tariff" id="tariff_test" value="test" data-days="1" data-price="1">
-                        <label for="tariff_test">
-                            <span class="name">🧪 Тестовый</span>
-                            <span class="price">1 ₽</span>
-                        </label>
-                    </div>
-                    <div class="tariff-option">
-                        <input type="radio" name="tariff" id="tariff_week" value="week" data-days="7" data-price="1000">
-                        <label for="tariff_week">
-                            <span class="name">1 неделя</span>
-                            <span class="price">1 000 ₽</span>
-                        </label>
-                    </div>
-                    <div class="tariff-option">
-                        <input type="radio" name="tariff" id="tariff_month" value="month" data-days="30" data-price="2000">
-                        <label for="tariff_month">
-                            <span class="name">1 месяц</span>
-                            <span class="price">2 000 ₽</span>
-                        </label>
-                    </div>
-                    <div class="tariff-option">
-                        <input type="radio" name="tariff" id="tariff_quarter" value="quarter" data-days="90" data-price="5000">
-                        <label for="tariff_quarter">
-                            <span class="name">3 месяца</span>
-                            <span class="price">5 000 ₽</span>
-                        </label>
-                    </div>
-                    <div class="tariff-option" style="grid-column: span 2;">
-                        <input type="radio" name="tariff" id="tariff_year" value="year" data-days="365" data-price="16000">
-                        <label for="tariff_year">
-                            <span class="name">1 год</span>
-                            <span class="price">16 000 ₽</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
+           <div class="form-group">
+    <label>Выберите тариф <span class="required">*</span></label>
+    <div class="tariffs-grid">
+        <div class="tariff-option">
+            <input type="radio" name="tariff" id="tariff_week" value="week" data-days="7" data-price="1000">
+            <label for="tariff_week">
+                <span class="name">1 неделя</span>
+                <span class="price">1 000 ₽</span>
+            </label>
+        </div>
+        <div class="tariff-option">
+            <input type="radio" name="tariff" id="tariff_month" value="month" data-days="30" data-price="2000">
+            <label for="tariff_month">
+                <span class="name">1 месяц</span>
+                <span class="price">2 000 ₽</span>
+            </label>
+        </div>
+        <div class="tariff-option">
+            <input type="radio" name="tariff" id="tariff_quarter" value="quarter" data-days="90" data-price="5000">
+            <label for="tariff_quarter">
+                <span class="name">3 месяца</span>
+                <span class="price">5 000 ₽</span>
+            </label>
+        </div>
+        <div class="tariff-option" style="grid-column: span 2;">
+            <input type="radio" name="tariff" id="tariff_year" value="year" data-days="365" data-price="16000">
+            <label for="tariff_year">
+                <span class="name">1 год</span>
+                <span class="price">16 000 ₽</span>
+            </label>
+        </div>
+    </div>
+</div>
 
             <button class="btn btn-primary" id="payBtn" disabled>
                 💳 Оплатить
